@@ -19,7 +19,7 @@ public class PaymentCmdImpl implements PaymentCmd{
 
 	@Override
 	public ResponseEntity<Map<String, String>> getPayment() {
-		// TODO Auto-generated method stub
+		// TODO Auto-generated method stub this for conflit
 		//This is preeti
 		return null;
 	}
