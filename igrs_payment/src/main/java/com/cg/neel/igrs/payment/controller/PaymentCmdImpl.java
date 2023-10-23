@@ -19,6 +19,8 @@ public class PaymentCmdImpl implements PaymentCmd{
 
 	@Override
 	public ResponseEntity<Map<String, String>> getPayment() {
+
+
 		//This is preeti
 		return null;
 	}
