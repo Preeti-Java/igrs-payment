@@ -1,7 +1,7 @@
 /**
  * 
  */
-package com.cg.neel.igrs.payment.data;
+package com.cg.neel.igrs.payment.databean;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Column;

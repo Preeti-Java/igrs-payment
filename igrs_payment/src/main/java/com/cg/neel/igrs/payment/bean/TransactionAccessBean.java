@@ -13,7 +13,7 @@ import javax.persistence.JoinColumn;
 import javax.persistence.OneToOne;
 import javax.persistence.Table;
 
-import com.cg.neel.igrs.payment.data.FileIdAccessBean;
+import com.cg.neel.igrs.payment.databean.FileIdAccessBean;
 import com.cg.neel.igrs.payment.utils.DateAudit;
 
 import lombok.AllArgsConstructor;

@@ -1,4 +1,4 @@
-package com.cg.neel.igrs.payment.data;
+package com.cg.neel.igrs.payment.databean;
 
 
 import java.util.List;
