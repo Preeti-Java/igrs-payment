@@ -12,7 +12,8 @@ import org.springframework.web.bind.annotation.RequestParam;
  * 
  */
 
-@FeignClient("IGRS_SERVICE")
+//@FeignClient("IGRS_SERVICE")
+@FeignClient("IGRS-SERVICE-Preeti")
 @Service
 public interface Igrs_Service {
 

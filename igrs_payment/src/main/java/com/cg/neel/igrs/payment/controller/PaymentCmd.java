@@ -7,6 +7,8 @@ import java.util.Map;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
@@ -21,4 +23,9 @@ public interface PaymentCmd {
 	@GetMapping("/info")
 	ResponseEntity<Map<String,String>> getPayment(@RequestParam String fileCode);
 	
+	@PostMapping("/paid")
+	ResponseEntity<String> paidPayment(@RequestParam String str);
+	
+	@PostMapping("/create_order")
+	ResponseEntity<String> createOrder(@RequestBody Map<String,String> data) throws Exception;
 }

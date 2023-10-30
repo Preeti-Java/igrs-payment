@@ -10,7 +10,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.cg.neel.igrs.payment.data.DataService;
+import com.cg.neel.igrs.payment.service.PaymentService;
 import com.cg.neel.igrs.payment.users.UserService;
 
 import lombok.AllArgsConstructor;
@@ -28,8 +28,10 @@ public class PaymentCmdImpl implements PaymentCmd{
 
 	private final UserService userService;
 	
-	private final DataService dataService;
+	
+	private final PaymentService paymentService;
 
+	//Work in Future
 	@Override
 	public ResponseEntity<Map<String, String>> getPayment(final String fileCode) {
 		log.info("Request Received for /payment/info endpoint.");
@@ -45,6 +47,23 @@ public class PaymentCmdImpl implements PaymentCmd{
 		
 		return null;
 	}
-	
+
+	@Override
+	public ResponseEntity<String> paidPayment(String str) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public ResponseEntity<String> createOrder(final Map<String, String> data) throws Exception {
+		//Check Map  is empty or not
+		if(data.size() == 0)
+			return ResponseEntity.ok("Order Details is empty");
+		//Call Service
+		paymentService.createPaymentOrder(data);
+		
+		return null;
+	}
+
 
 }
