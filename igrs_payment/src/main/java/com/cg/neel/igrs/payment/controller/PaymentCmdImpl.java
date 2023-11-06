@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.cg.neel.igrs.payment.service.PaymentService;
 import com.cg.neel.igrs.payment.users.UserService;
+import com.cg.neel.igrs.payment.utils.UserUtils;
 
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -26,9 +27,6 @@ import lombok.extern.slf4j.Slf4j;
 @AllArgsConstructor
 public class PaymentCmdImpl implements PaymentCmd{
 
-	private final UserService userService;
-	
-	
 	private final PaymentService paymentService;
 
 	//Work in Future
@@ -36,8 +34,8 @@ public class PaymentCmdImpl implements PaymentCmd{
 	public ResponseEntity<Map<String, String>> getPayment(final String fileCode) {
 		log.info("Request Received for /payment/info endpoint.");
 		
-		//Calling User Micro Service
-		Long userId = userService.getUserId();
+		//Get User Details
+		Long userId = UserUtils.getUserDetails();
 		if(userId == 0L) 
 			 return ResponseEntity.ok().body(Collections.emptyMap()); 
 		
@@ -50,7 +48,6 @@ public class PaymentCmdImpl implements PaymentCmd{
 
 	@Override
 	public ResponseEntity<String> paidPayment(String str) {
-		// TODO Auto-generated method stub
 		return null;
 	}
 

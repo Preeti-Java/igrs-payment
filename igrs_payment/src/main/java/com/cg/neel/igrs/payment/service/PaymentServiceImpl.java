@@ -23,7 +23,7 @@ public class PaymentServiceImpl implements PaymentService {
 		String amount = data.getOrDefault("amount", "200");
 		
 		if(!data.containsKey("fileId"))
-			throw new Exception("Fileid bot found");
+			throw new Exception("Fileid not found");
 		String fileId = data.getOrDefault("fileId", "000");
 		
 		//Get User Details
