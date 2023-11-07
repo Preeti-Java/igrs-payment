@@ -29,12 +29,20 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler{
 	 
 	 private final MessageSource messageResource;
 	 
-	 @ExceptionHandler({ BadCredentialException.class })
+	    @ExceptionHandler({ BadCredentialException.class })
 		@ResponseStatus(value = HttpStatus.BAD_REQUEST)
 		public ResponseEntity<Object> handlerBadCredentialsException(final BadCredentialException ex, final WebRequest request){
 			log.error("400 Bad Request",ex);
 			final GenericResponse bodyResponse = new GenericResponse(messageResource.getMessage("message.badCredentail", null, request.getLocale()));
 			return handleExceptionInternal(ex, bodyResponse, new HttpHeaders(), HttpStatus.BAD_REQUEST, request);
 		}
+	    
+	    @ExceptionHandler({OrderFailedException.class})
+	    @ResponseStatus(value = HttpStatus.OK)
+	    public ResponseEntity<Object> handlerOrderFailedException(final OrderFailedException ex, final WebRequest request){
+	    	log.error("Order Failed",ex);
+	    	final GenericResponse bodyResponse = new GenericResponse(messageResource.getMessage("message.orderFailed", null,request.getLocale()));
+	    	return handleExceptionInternal(ex, bodyResponse, new HttpHeaders(), HttpStatus.OK, request);
+	    }
 
 }

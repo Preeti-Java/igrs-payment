@@ -37,7 +37,10 @@ public class TransactionOrderAccessBean extends DateAudit {
 	private Long transactionOrderId;
 	
 	@Column(name = "TRANSACTIONVALUE")
-	private Long transactionValue;
+	private String transactionValue;
+	
+	@Column(name = "TRANSACTIONRECEIPT")
+	private String transactionReceipt;
 
 	@OneToOne(mappedBy = "transactionOrderAccessBean")
 	private TransactionAccessBean transactionAccessBean;
