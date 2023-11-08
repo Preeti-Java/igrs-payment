@@ -14,6 +14,6 @@ public interface PaymentService {
 	 * @param data
 	 * @throws Exception 
 	 */
-	void createPaymentOrder(Map<String, String> data) throws Exception;
+	 Map<String, String> createPaymentOrder(Map<String, String> data) throws Exception;
 
 }

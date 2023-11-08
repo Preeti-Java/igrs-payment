@@ -3,6 +3,7 @@
  */
 package com.cg.neel.igrs.payment.service;
 
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 
@@ -20,9 +21,8 @@ import com.cg.neel.igrs.payment.databean.SubDistrictAccessBean;
 import com.cg.neel.igrs.payment.exception.OrderFailedException;
 import com.cg.neel.igrs.payment.external.service.PaymentRazorPayService;
 import com.cg.neel.igrs.payment.repository.AmountRepository;
-import com.cg.neel.igrs.payment.repository.DistrictRepository;
+import com.cg.neel.igrs.payment.repository.FileIdRepository;
 import com.cg.neel.igrs.payment.repository.StatusRepository;
-import com.cg.neel.igrs.payment.repository.SubDistrictRepository;
 import com.cg.neel.igrs.payment.repository.TransactionRepository;
 import com.cg.neel.igrs.payment.utils.DataUtils;
 import com.cg.neel.igrs.payment.utils.UserUtils;
@@ -46,17 +46,19 @@ public class PaymentServiceImpl implements PaymentService {
 	private final AmountRepository amountRepository;
 	
 	private final TransactionRepository transactionRepository;
+	
+	private final FileIdRepository fileIdRepository;
 
 	@Override
-	public void createPaymentOrder(Map<String, String> data) throws Exception {
+	public Map<String, String> createPaymentOrder(Map<String, String> map) throws Exception {
 		//Check payment amount and file-Id present or not
-		if(!data.containsKey("amount"))
-			throw new Exception("Amount Value not found");
-		String amount = data.getOrDefault("amount", "200");
+		boolean check = map.values().stream().allMatch(value -> !value.isEmpty() && value != null);
 		
-		if(!data.containsKey("fileId"))
-			throw new Exception("Fileid not found");
-		String fileId = data.getOrDefault("fileId", "000");
+		if(!check)
+			throw new OrderFailedException("Order value not found");
+		
+		String amount = map.getOrDefault("amount", "200");
+		String fileId = map.getOrDefault("fileId", "000");
 		
 		//Get User Details
 		Long userId = UserUtils.getUserDetails();
@@ -66,59 +68,49 @@ public class PaymentServiceImpl implements PaymentService {
 		if(order == null)
 			throw new OrderFailedException("Order Failed");
 		//Save in db
-		saveOrder(order,fileId,userId);
+		TransactionAccessBean transactionOrder = saveOrder(order,fileId,userId);
 		
-		
-		
+		//convert into return map value		
+		Map<String,String> data = convertIntoMap(transactionOrder);
+		data.put("txAmount", amount);
 		//User Logs
 		
 		
 		//Payment Logs
 		
+		return data;
 		
+	}
+
+	/**
+	 * @param transactionOrder
+	 * @return map
+	 */
+	private Map<String, String> convertIntoMap(TransactionAccessBean transaction) {
+		
+		Map<String,String> map = new HashMap<>();
+		map.put("txId", transaction.getTransactionOrderAccessBean().getTransactionValue());
+		map.put("txReceipt", transaction.getTransactionOrderAccessBean().getTransactionReceipt());
+		
+		return map;
 	}
 
 	/**
 	 * @param order
 	 * @param fileId
 	 * @param userId 
+	 * @return 
 	 */
-	private void saveOrder(Order order, String fileId, Long userId) {
-		
-		//Get Status
-		Optional<StatusAccessBean> statusDetails = statusRepository.findByStatusValue(order.get("status"));
-		
-		//Get Amount
-		Optional<AmountAccessBean> amountDetails = amountRepository.findByValue(new Long(order.get("amount")));
+	private TransactionAccessBean saveOrder(Order order, String fileId, Long userId) {
 		
 		//set Many payment
-		TransactionPaymentAccessBean transactionPaymentAccessBean = new TransactionPaymentAccessBean();
-		//set status
-		if(statusDetails.isPresent())
-			transactionPaymentAccessBean.setStatusAccessBean(statusDetails.get());
-		//set amount
-		if(amountDetails.isPresent())
-			transactionPaymentAccessBean.setAmountAccessBean(amountDetails.get());
-		
-		//First find by code
-		SubDistrictCodeAccessBean subDistrictCodeAccessBean = dataUtils.districtNameByFileId(fileId);
-		//Get SubDistrict
-		SubDistrictAccessBean subDistrictAccessBean = subDistrictCodeAccessBean.getSubDistrictAccessBean();
-		//Get District
-		DistrictAccessBean districtAccessBean = subDistrictCodeAccessBean.getSubDistrictAccessBean().getDistrictAccessBean();
-		
+		TransactionPaymentAccessBean transactionPaymentAccessBean = setTxPayment(order);
+	
 		//Set Many FileId
-		FileIdAccessBean fileIdAccessBean = new FileIdAccessBean();
-		//set district
-		fileIdAccessBean.setDistrictAccessBean(districtAccessBean);
-		//set subDistrict
-		fileIdAccessBean.setSubDistrictAccessBean(subDistrictAccessBean);
+		FileIdAccessBean fileIdAccessBean = setTxFileId(fileId);
 		
 		//Set Many order
-		TransactionOrderAccessBean transactionOrderAccessBean = new TransactionOrderAccessBean();
-		transactionOrderAccessBean.setTransactionValue(order.get("id"));
-		transactionOrderAccessBean.setTransactionReceipt(order.get("receipt"));
-		
+		TransactionOrderAccessBean transactionOrderAccessBean = setTxOrder(order);
 		
 		//Final Join in TRanscation table
 		TransactionAccessBean transactionAccessBean = new TransactionAccessBean();
@@ -130,6 +122,74 @@ public class PaymentServiceImpl implements PaymentService {
 		//save
 		transactionRepository.save(transactionAccessBean);
 		
+		return transactionAccessBean;
+		
+	}
+
+	/**
+	 * @param order
+	 * @return TransactionOrderAccessBean
+	 */
+	private TransactionOrderAccessBean setTxOrder(Order order) {
+		TransactionOrderAccessBean transactionOrderAccessBean = new TransactionOrderAccessBean();
+		transactionOrderAccessBean.setTransactionValue(order.get("id"));
+		transactionOrderAccessBean.setTransactionReceipt(order.get("receipt"));
+		return transactionOrderAccessBean;
+	}
+
+	/**
+	 * @param fileId
+	 * @return FileIdAccessBean
+	 * @apiNote Duplicate not allowed
+	 */
+	private FileIdAccessBean setTxFileId(String fileId) {
+		
+		//Verify data already exist in db or not
+		return fileIdRepository.findByValue(fileId).orElseGet(
+				() -> {  
+					//First find by code
+					SubDistrictCodeAccessBean subDistrictCodeAccessBean = dataUtils.districtNameByFileId(fileId);
+					//Get SubDistrict
+					SubDistrictAccessBean subDistrictAccessBean = subDistrictCodeAccessBean.getSubDistrictAccessBean();
+					//Get District
+					DistrictAccessBean districtAccessBean = subDistrictCodeAccessBean.getSubDistrictAccessBean().getDistrictAccessBean();
+					
+					FileIdAccessBean fileIdAccessBean = new FileIdAccessBean();
+					fileIdAccessBean.setValue(fileId);
+					//set district
+					fileIdAccessBean.setDistrictAccessBean(districtAccessBean);
+					//set subDistrict
+					fileIdAccessBean.setSubDistrictAccessBean(subDistrictAccessBean);
+					
+					return fileIdAccessBean;
+				});
+		
+	}
+
+	/**
+	 * @param order
+	 * @return transactionPaymentAccessBean
+	 */
+	private TransactionPaymentAccessBean setTxPayment(Order order) {
+		
+		TransactionPaymentAccessBean transactionPaymentAccessBean = new TransactionPaymentAccessBean();
+		
+		//Get Status
+		Optional<StatusAccessBean> statusDetails = statusRepository.findByStatusValue(order.get("status"));
+		
+		//Get Amount
+		Integer amount = order.get("amount");
+		Long i = new Long(amount);
+		Optional<AmountAccessBean> amountDetails = amountRepository.findByValue(i);
+		
+		//set status
+		if(statusDetails.isPresent())
+			transactionPaymentAccessBean.setStatusAccessBean(statusDetails.get());
+		//set amount
+		if(amountDetails.isPresent())
+			transactionPaymentAccessBean.setAmountAccessBean(amountDetails.get());
+				
+		return transactionPaymentAccessBean;
 	}
 
 }

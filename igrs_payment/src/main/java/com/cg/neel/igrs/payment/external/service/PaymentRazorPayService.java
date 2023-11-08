@@ -5,6 +5,7 @@ package com.cg.neel.igrs.payment.external.service;
 
 
 import java.time.LocalDate;
+import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 
 import org.json.JSONObject;
@@ -61,8 +62,7 @@ public class PaymentRazorPayService {
 			notes.put("notes_key_1", notesKey); // Create multiple notes
 			orderRequest.put("notes", notes);
 			
-			Order order = razorPay.orders.create(orderRequest);
-			return order;
+			return razorPay.orders.create(orderRequest);
 			
 		} catch (RazorpayException e) {
 			e.printStackTrace();
@@ -76,7 +76,7 @@ public class PaymentRazorPayService {
 	 * @return number
 	 */
 	private String createDynamicReceipt(String receipt, String fileId) {
-		return receipt+LocalDate.now().format(DateTimeFormatter.BASIC_ISO_DATE)+"#"+fileId;
+		return receipt+LocalDate.now().format(DateTimeFormatter.BASIC_ISO_DATE)+LocalTime.now()+"#"+fileId;
 	}
 
 }

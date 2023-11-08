@@ -38,6 +38,9 @@ public class TransactionPaymentAccessBean extends DateAudit {
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long transactionPaymentId;
 	
+	@Column(name = "PAYMENTID")
+	private String paymentId;
+	
 	@OneToOne(cascade = CascadeType.ALL)
 	@JoinColumn(name = "AMOUNT_ID")
 	private AmountAccessBean amountAccessBean;

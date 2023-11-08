@@ -11,7 +11,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.cg.neel.igrs.payment.service.PaymentService;
-import com.cg.neel.igrs.payment.users.UserService;
 import com.cg.neel.igrs.payment.utils.UserUtils;
 
 import lombok.AllArgsConstructor;
@@ -52,14 +51,13 @@ public class PaymentCmdImpl implements PaymentCmd{
 	}
 
 	@Override
-	public ResponseEntity<String> createOrder(final Map<String, String> data) throws Exception {
+	public ResponseEntity<Map<String, String>> createOrder(final Map<String, String> map) throws Exception {
 		//Check Map  is empty or not
-		if(data.size() == 0)
-			return ResponseEntity.ok("Order Details is empty");
-		//Call Service
-		paymentService.createPaymentOrder(data);
+		if(map.size() == 0)
+			throw new Exception("Order Details is empty");
 		
-		return null;
+		 Map<String, String> data = paymentService.createPaymentOrder(map);
+		return ResponseEntity.ok().body(data);
 	}
 
 
