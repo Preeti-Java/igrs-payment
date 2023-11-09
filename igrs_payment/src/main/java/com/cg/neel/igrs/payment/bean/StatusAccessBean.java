@@ -3,12 +3,14 @@
  */
 package com.cg.neel.igrs.payment.bean;
 
+import java.util.List;
+
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
-import javax.persistence.OneToOne;
+import javax.persistence.OneToMany;
 import javax.persistence.Table;
 
 import lombok.AllArgsConstructor;
@@ -42,6 +44,6 @@ public class StatusAccessBean {
 	@Column(name = "STATUSDESCRIPTION")
 	private String statusDescription;
 
-	@OneToOne(mappedBy = "statusAccessBean")
-	private TransactionPaymentAccessBean transactionPaymentAccessBean;
+	@OneToMany(mappedBy = "statusAccessBean")
+	private List<TransactionPaymentAccessBean> transactionPaymentAccessBean;
 }

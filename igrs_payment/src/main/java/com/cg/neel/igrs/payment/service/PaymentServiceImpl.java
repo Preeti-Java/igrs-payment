@@ -23,6 +23,7 @@ import com.cg.neel.igrs.payment.external.service.PaymentRazorPayService;
 import com.cg.neel.igrs.payment.repository.AmountRepository;
 import com.cg.neel.igrs.payment.repository.FileIdRepository;
 import com.cg.neel.igrs.payment.repository.StatusRepository;
+import com.cg.neel.igrs.payment.repository.TransactionOrderRepository;
 import com.cg.neel.igrs.payment.repository.TransactionRepository;
 import com.cg.neel.igrs.payment.utils.DataUtils;
 import com.cg.neel.igrs.payment.utils.UserUtils;
@@ -47,17 +48,19 @@ public class PaymentServiceImpl implements PaymentService {
 	
 	private final TransactionRepository transactionRepository;
 	
+	private final TransactionOrderRepository transactionOrderRepository;
+	
 	private final FileIdRepository fileIdRepository;
 
 	@Override
-	public Map<String, String> createPaymentOrder(Map<String, String> map) throws Exception {
+	public Map<String, String> createPaymentOrder(Map<String, String> map) {
 		//Check payment amount and file-Id present or not
 		boolean check = map.values().stream().allMatch(value -> !value.isEmpty() && value != null);
 		
 		if(!check)
 			throw new OrderFailedException("Order value not found");
 		
-		String amount = map.getOrDefault("amount", "200");
+		String amount = map.getOrDefault("amount", "20000");
 		String fileId = map.getOrDefault("fileId", "000");
 		
 		//Get User Details
@@ -190,6 +193,48 @@ public class PaymentServiceImpl implements PaymentService {
 			transactionPaymentAccessBean.setAmountAccessBean(amountDetails.get());
 				
 		return transactionPaymentAccessBean;
+	}
+
+	/**
+	 * @param order_id,payment_id,status
+	 * @return transactionPaymentAccessBean
+	 */
+	@Override
+	public void updatePaymentOrder(Map<String, String> map) {
+		
+		boolean flag = map.values().stream().allMatch(value -> !value.isEmpty() && value == null);
+		if(flag)
+			throw new OrderFailedException("Order update value not found");
+		
+		String orderId = map.get("txId");
+		String paymentId = map.get("txPaymentId");
+		String status = map.get("txStatus");
+		
+		try {
+		  updateTxOrder(orderId,paymentId,status);
+		}
+		catch(Exception e) {
+			throw new OrderFailedException("Order is not update successfully");
+		}
+	}
+
+	/**
+	 * @param order_id
+	 * @param payment_id
+	 * @param status
+	 * @return
+	 */
+	private void updateTxOrder(String orderId, String paymentId, String status) {
+		
+		TransactionOrderAccessBean transactionOrderAccessBean = transactionOrderRepository.findByTransactionValue(orderId).orElseThrow(OrderFailedException::new);
+		
+		TransactionPaymentAccessBean transactionPaymentAccessBean = transactionOrderAccessBean.getTransactionAccessBean().getTransactionPaymentAccessBean();
+
+		transactionPaymentAccessBean.setStatusAccessBean(statusRepository.findByStatusValue(status).get());
+		transactionPaymentAccessBean.setPaymentId(paymentId);
+		
+		transactionOrderRepository.save(transactionOrderAccessBean);
+		
 	}
 
 }

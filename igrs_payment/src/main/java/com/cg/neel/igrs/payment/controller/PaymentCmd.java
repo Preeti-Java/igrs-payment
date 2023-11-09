@@ -27,5 +27,8 @@ public interface PaymentCmd {
 	ResponseEntity<String> paidPayment(@RequestParam String str);
 	
 	@PostMapping("/create_order")
-	ResponseEntity<Map<String, String>> createOrder(@RequestBody Map<String,String> data) throws Exception;
+	ResponseEntity<Map<String, String>> createOrder(@RequestBody Map<String,String> data);
+	
+	@PostMapping("/update_order")
+	ResponseEntity<?> updateOrder(@RequestBody Map<String,String> data);
 }

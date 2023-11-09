@@ -10,6 +10,7 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
 import javax.persistence.OneToOne;
 import javax.persistence.Table;
 
@@ -49,7 +50,7 @@ public class TransactionAccessBean extends DateAudit {
 	@JoinColumn(name = "TRANSACTIONPAYMENT_ID")
 	private TransactionPaymentAccessBean transactionPaymentAccessBean;
 	
-	@OneToOne(cascade = CascadeType.ALL)
+	@ManyToOne(cascade = CascadeType.ALL)
 	@JoinColumn(name = "FILE_ID")
 	private FileIdAccessBean fileIdAccessBean;
 	

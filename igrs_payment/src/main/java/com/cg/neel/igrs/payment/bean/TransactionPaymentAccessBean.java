@@ -10,7 +10,7 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
-import javax.persistence.OneToOne;
+import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 
 import com.cg.neel.igrs.payment.utils.DateAudit;
@@ -41,11 +41,11 @@ public class TransactionPaymentAccessBean extends DateAudit {
 	@Column(name = "PAYMENTID")
 	private String paymentId;
 	
-	@OneToOne(cascade = CascadeType.ALL)
+	@ManyToOne(cascade = CascadeType.ALL)
 	@JoinColumn(name = "AMOUNT_ID")
 	private AmountAccessBean amountAccessBean;
 	
-	@OneToOne(cascade = CascadeType.ALL)
+	@ManyToOne(cascade = CascadeType.ALL)
 	@JoinColumn(name = "STATUS_ID")
 	private StatusAccessBean statusAccessBean;
 	
