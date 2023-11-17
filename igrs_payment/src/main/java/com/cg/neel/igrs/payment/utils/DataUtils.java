@@ -25,7 +25,7 @@ public class DataUtils {
 	 * @param fileCode - fileId
 	 * @return District Name/Sub District Name
 	 */
-	public SubDistrictCodeAccessBean districtNameByFileId(String fileCode) {
+	public SubDistrictCodeAccessBean districtNameByFileCode(String fileCode) {
 		//Extract english word from fileID
 		String code = firstNumericValue(fileCode);
 		

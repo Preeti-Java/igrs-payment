@@ -39,18 +39,31 @@ import lombok.RequiredArgsConstructor;
 public class PaymentServiceImpl implements PaymentService {
 	
 	private final DataUtils dataUtils;
-	
 	private final PaymentRazorPayService paymentRazorPayService;
-	
 	private final StatusRepository statusRepository;
-	
 	private final AmountRepository amountRepository;
-	
 	private final TransactionRepository transactionRepository;
-	
 	private final TransactionOrderRepository transactionOrderRepository;
-	
 	private final FileIdRepository fileIdRepository;
+	
+	
+	//Exception
+	private static final String ORDER_VALUE_NOT_FOUND = "Order value not found";
+	private static final String ORDER_FAILED = "Order Failed";
+	private static final String ORDER_UPDATE_VALUE_NOT_FOUND = "Order update value not found";
+	private static final String ORDER_IS_NOT_UPDATE_SUCCESSFULLY = "Order is not update successfully";
+	
+	//Map Key
+	private static final String TRANSACTION_ID = "txId";
+	private static final String TRANSACTION_PAYMENT_ID = "txPaymentId";
+	private static final String TRANSACTION_STATUS = "txStatus";
+	private static final String TRANSACTION_AMOUNT = "txAmount";
+	private static final String TRANSACTION_RECEIPT ="txReceipt";
+	private static final String STATUS = "status";
+	private static final String AMOUNT = "amount";
+	private static final String ID = "id";
+	private static final String FILE_ID = "fileId";
+	private static final String RECEIPT = "receipt";
 
 	@Override
 	public Map<String, String> createPaymentOrder(Map<String, String> map) {
@@ -58,10 +71,10 @@ public class PaymentServiceImpl implements PaymentService {
 		boolean check = map.values().stream().allMatch(value -> !value.isEmpty() && value != null);
 		
 		if(!check)
-			throw new OrderFailedException("Order value not found");
+			throw new OrderFailedException(ORDER_VALUE_NOT_FOUND);
 		
-		String amount = map.getOrDefault("amount", "20000");
-		String fileId = map.getOrDefault("fileId", "000");
+		String amount = map.getOrDefault(AMOUNT, "20000");
+		String fileId = map.getOrDefault(FILE_ID, "000");
 		
 		//Get User Details
 		Long userId = UserUtils.getUserDetails();
@@ -69,13 +82,13 @@ public class PaymentServiceImpl implements PaymentService {
 		//Payment API
 		Order order = paymentRazorPayService.getOrderId(amount,fileId);
 		if(order == null)
-			throw new OrderFailedException("Order Failed");
+			throw new OrderFailedException(ORDER_FAILED);
 		//Save in db
 		TransactionAccessBean transactionOrder = saveOrder(order,fileId,userId);
 		
 		//convert into return map value		
 		Map<String,String> data = convertIntoMap(transactionOrder);
-		data.put("txAmount", amount);
+		data.put(TRANSACTION_AMOUNT, amount);
 		//User Logs
 		
 		
@@ -92,8 +105,8 @@ public class PaymentServiceImpl implements PaymentService {
 	private Map<String, String> convertIntoMap(TransactionAccessBean transaction) {
 		
 		Map<String,String> map = new HashMap<>();
-		map.put("txId", transaction.getTransactionOrderAccessBean().getTransactionValue());
-		map.put("txReceipt", transaction.getTransactionOrderAccessBean().getTransactionReceipt());
+		map.put(TRANSACTION_ID, transaction.getTransactionOrderAccessBean().getTransactionValue());
+		map.put(TRANSACTION_RECEIPT, transaction.getTransactionOrderAccessBean().getTransactionReceipt());
 		
 		return map;
 	}
@@ -135,8 +148,8 @@ public class PaymentServiceImpl implements PaymentService {
 	 */
 	private TransactionOrderAccessBean setTxOrder(Order order) {
 		TransactionOrderAccessBean transactionOrderAccessBean = new TransactionOrderAccessBean();
-		transactionOrderAccessBean.setTransactionValue(order.get("id"));
-		transactionOrderAccessBean.setTransactionReceipt(order.get("receipt"));
+		transactionOrderAccessBean.setTransactionValue(order.get(ID));
+		transactionOrderAccessBean.setTransactionReceipt(order.get(RECEIPT));
 		return transactionOrderAccessBean;
 	}
 
@@ -151,7 +164,7 @@ public class PaymentServiceImpl implements PaymentService {
 		return fileIdRepository.findByValue(fileId).orElseGet(
 				() -> {  
 					//First find by code
-					SubDistrictCodeAccessBean subDistrictCodeAccessBean = dataUtils.districtNameByFileId(fileId);
+					SubDistrictCodeAccessBean subDistrictCodeAccessBean = dataUtils.districtNameByFileCode(fileId);
 					//Get SubDistrict
 					SubDistrictAccessBean subDistrictAccessBean = subDistrictCodeAccessBean.getSubDistrictAccessBean();
 					//Get District
@@ -178,10 +191,10 @@ public class PaymentServiceImpl implements PaymentService {
 		TransactionPaymentAccessBean transactionPaymentAccessBean = new TransactionPaymentAccessBean();
 		
 		//Get Status
-		Optional<StatusAccessBean> statusDetails = statusRepository.findByStatusValue(order.get("status"));
+		Optional<StatusAccessBean> statusDetails = statusRepository.findByStatusValue(order.get(STATUS));
 		
 		//Get Amount
-		Integer amount = order.get("amount");
+		Integer amount = order.get(AMOUNT);
 		Long i = new Long(amount);
 		Optional<AmountAccessBean> amountDetails = amountRepository.findByValue(i);
 		
@@ -204,17 +217,17 @@ public class PaymentServiceImpl implements PaymentService {
 		
 		boolean flag = map.values().stream().allMatch(value -> !value.isEmpty() && value == null);
 		if(flag)
-			throw new OrderFailedException("Order update value not found");
+			throw new OrderFailedException(ORDER_UPDATE_VALUE_NOT_FOUND);
 		
-		String orderId = map.get("txId");
-		String paymentId = map.get("txPaymentId");
-		String status = map.get("txStatus");
+		String orderId = map.get(TRANSACTION_ID);
+		String paymentId = map.get(TRANSACTION_PAYMENT_ID);
+		String status = map.get(TRANSACTION_STATUS);
 		
 		try {
 		  updateTxOrder(orderId,paymentId,status);
 		}
 		catch(Exception e) {
-			throw new OrderFailedException("Order is not update successfully");
+			throw new OrderFailedException(ORDER_IS_NOT_UPDATE_SUCCESSFULLY);
 		}
 	}
 

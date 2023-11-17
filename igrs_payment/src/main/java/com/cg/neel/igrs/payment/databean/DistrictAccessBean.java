@@ -9,7 +9,6 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.OneToMany;
-import javax.persistence.OneToOne;
 import javax.persistence.Table;
 
 import lombok.AllArgsConstructor;
@@ -36,8 +35,8 @@ public class DistrictAccessBean{
 	@Column(name = "ENGLISH")
 	private String english;
 	
-	@OneToOne(mappedBy = "districtAccessBean")
-	private FileIdAccessBean fileIdAccessBean;
+	@OneToMany(mappedBy = "districtAccessBean")
+	private List<FileIdAccessBean> fileIdAccessBean;
 	
 	@OneToMany(mappedBy = "districtAccessBean")
 	private List<SubDistrictAccessBean> subDistrictAccessBeans;

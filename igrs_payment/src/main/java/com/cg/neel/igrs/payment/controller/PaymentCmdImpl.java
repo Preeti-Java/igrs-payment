@@ -28,6 +28,13 @@ import lombok.extern.slf4j.Slf4j;
 public class PaymentCmdImpl implements PaymentCmd{
 
 	private final PaymentService paymentService;
+	
+	//Exception
+	private static final String ORDER_DETAILS_IS_EMPTY = "Order Details is empty";
+	private static final String ORDER_UPDATE_DETAILS_IS_EMPTY = "Order Update Details is empty";
+	
+	//Status
+	private static final String UPDATED = "Updated";
 
 	//Work in Future
 	@Override
@@ -55,7 +62,7 @@ public class PaymentCmdImpl implements PaymentCmd{
 	public ResponseEntity<Map<String, String>> createOrder(final Map<String, String> map) {
 		//Check Map  is empty or not
 		if(map.size() == 0)
-			throw new OrderFailedException("Order Details is empty");
+			throw new OrderFailedException(ORDER_DETAILS_IS_EMPTY);
 		
 		 Map<String, String> data = paymentService.createPaymentOrder(map);
 		return ResponseEntity.ok().body(data);
@@ -65,10 +72,10 @@ public class PaymentCmdImpl implements PaymentCmd{
 	public ResponseEntity<?>  updateOrder(Map<String, String> map) {
 		//Check Map is empty or not
 		if(map.size() == 0)
-			throw new OrderFailedException("Order Update Details is empty");
+			throw new OrderFailedException(ORDER_UPDATE_DETAILS_IS_EMPTY);
 		
 		paymentService.updatePaymentOrder(map);
-		return ResponseEntity.ok().body("Updated");
+		return ResponseEntity.ok().body(UPDATED);
 	}
 
 

@@ -5,15 +5,14 @@ package com.cg.neel.igrs.payment.databean;
 
 import java.util.List;
 
-import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
-import javax.persistence.OneToOne;
 import javax.persistence.Table;
 
 import com.cg.neel.igrs.payment.bean.TransactionAccessBean;
@@ -45,11 +44,11 @@ public class FileIdAccessBean{
 	@Column(name = "VALUE")
 	private String value;
 	
-	@OneToOne(cascade = CascadeType.ALL)
+	@ManyToOne
 	@JoinColumn(name = "DISTRICT_ID")
 	private DistrictAccessBean districtAccessBean;
 	
-	@OneToOne(cascade = CascadeType.ALL)
+	@ManyToOne
 	@JoinColumn(name = "SUBDISTRICT_ID")
 	private SubDistrictAccessBean subDistrictAccessBean;
 	
