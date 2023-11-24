@@ -78,5 +78,16 @@ public class PaymentCmdImpl implements PaymentCmd{
 		return ResponseEntity.ok().body(UPDATED);
 	}
 
+	@Override
+	public boolean verifyTxStatusByFileIdAndUserId(String fileId, String userId) {
+		//check fileId and userId
+		if(fileId.isEmpty() || userId.isEmpty())
+			return false;
+		
+		boolean status = paymentService.verifyTxStatusByFileIdAndUserId(fileId,userId);
+		
+		return false;
+	}
+
 
 }

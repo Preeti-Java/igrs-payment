@@ -23,4 +23,11 @@ public interface PaymentService {
 	 */
 	 void updatePaymentOrder(Map<String, String> map);
 
+	/**
+	 * @param fileId
+	 * @param userId
+	 * @return
+	 */
+	boolean verifyTxStatusByFileIdAndUserId(String fileId, String userId);
+
 }

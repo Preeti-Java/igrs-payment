@@ -13,6 +13,10 @@ import org.springframework.security.core.GrantedAuthority;
  */
 public class IgrsUsernamePasswordAuthenticationToken extends UsernamePasswordAuthenticationToken {
 
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
 	private String userId;
 	/**
 	 * @param principal

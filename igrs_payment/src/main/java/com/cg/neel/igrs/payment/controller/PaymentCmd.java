@@ -31,4 +31,7 @@ public interface PaymentCmd {
 	
 	@PostMapping("/update_order")
 	ResponseEntity<?> updateOrder(@RequestBody Map<String,String> data);
+	
+	@PostMapping("/txStatusByFileIdAndUserId")
+	boolean verifyTxStatusByFileIdAndUserId(@RequestParam String fileid, @RequestParam String userId);
 }
