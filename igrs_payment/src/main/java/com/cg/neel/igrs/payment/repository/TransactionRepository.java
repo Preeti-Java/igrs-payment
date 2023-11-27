@@ -18,13 +18,13 @@ public interface TransactionRepository extends JpaRepository<TransactionAccessBe
 	/**
 	 * @param fileId
 	 * @param userId
-	 * @param string
+	 * @param status value
 	 * @return
 	 */
-	@Query(value = "select statusvalue from igrspayment.status where status_id=("
-			+ "select status_id from igrspayment.transactionpayment where TRANSACTIONPAYMENT_ID = ("
-			+ "SELECT TRANSACTIONPAYMENT_ID FROM igrspayment.transaction where"
-			+ " userid = :userId and FILE_ID = (select FILE_ID from igrspayment.fileid where value= :fileId) order by TRANSACTIONPAYMENT_ID desc LIMIT 1))", nativeQuery = true)
-	String verifyTxStatusByFileIdAndUserIdAndStatus(String fileId, String userId);
+	@Query(value = "select statusvalue from status where status_id=("
+			+ "select status_id from transactionpayment where TRANSACTIONPAYMENT_ID = ("
+			+ "SELECT TRANSACTIONPAYMENT_ID FROM transaction where"
+			+ " userid = :userId and FILE_ID = (select FILE_ID from fileid where value= :fileId) order by TRANSACTIONPAYMENT_ID desc LIMIT 1))", nativeQuery = true)
+	String verifyTxStatusByFileIdAndUserIdAndStatus(String fileId, Long userId);
 
 }

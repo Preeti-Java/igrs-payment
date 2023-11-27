@@ -251,7 +251,7 @@ public class PaymentServiceImpl implements PaymentService {
 	}
 
 	@Override
-	public boolean verifyTxStatusByFileIdAndUserId(String fileId, String userId) {
+	public boolean verifyTxStatusByFileIdAndUserId(String fileId, Long userId) {
 		String tx = transactionRepository.verifyTxStatusByFileIdAndUserIdAndStatus(fileId,userId);
 		return tx != null;
 	}

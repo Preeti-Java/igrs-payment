@@ -79,9 +79,9 @@ public class PaymentCmdImpl implements PaymentCmd{
 	}
 
 	@Override
-	public boolean verifyTxStatusByFileIdAndUserId(String fileId, String userId) {
+	public boolean verifyTxStatusByFileIdAndUserId(String fileId, Long userId) {
 		//check fileId and userId
-		if(fileId.isEmpty() || userId.isEmpty())
+		if(fileId.isEmpty() || userId == null)
 			return false;
 		
 		boolean status = paymentService.verifyTxStatusByFileIdAndUserId(fileId,userId);

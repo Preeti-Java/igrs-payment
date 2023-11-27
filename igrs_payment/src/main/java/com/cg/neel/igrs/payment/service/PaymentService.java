@@ -28,6 +28,6 @@ public interface PaymentService {
 	 * @param userId
 	 * @return
 	 */
-	boolean verifyTxStatusByFileIdAndUserId(String fileId, String userId);
+	boolean verifyTxStatusByFileIdAndUserId(String fileId, Long userId);
 
 }
